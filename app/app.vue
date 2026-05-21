@@ -1,6 +1,19 @@
+<script setup>
+const colorMode = useColorMode()
+colorMode.preference = 'dark'
+</script>
+
 <template>
-  <div>
+  <UApp>
     <NuxtRouteAnnouncer />
-    <NuxtWelcome />
-  </div>
+    <div class="min-h-screen bg-secondary p-8">
+      <UCard class="w-1/6">
+        <template #header>
+      <div>Header</div>
+    </template>
+
+    <div>Hello</div>
+      </UCard>
+    </div>=
+  </UApp>
 </template>
