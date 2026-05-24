@@ -1,7 +1,7 @@
 <template>
   <div class="w-full min-h-0">
     <UCard
-      class="h-full overflow-hidden"
+      class="h-full"
       :ui="{ body: 'flex flex-col h-full min-h-0 p-4' }"
     >
       <div
@@ -33,9 +33,9 @@
             </div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <USelect
+            <USelectMenu
               v-model="timeframe"
-              :options="timeframes"
+              :items="timeframes"
               size="sm"
             />
             <UButton

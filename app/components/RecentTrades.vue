@@ -11,13 +11,13 @@
             <UInput
               v-model="searchSymbol"
               placeholder="Search symbol..."
-              size="sm"
+              size="lg"
               icon="i-heroicons-magnifying-glass-20-solid"
             />
-            <USelect
+            <USelectMenu
               v-model="sortBy"
-              :options="sortOptions"
-              size="sm"
+              :items="sortOptions"
+              size="lg"
             />
           </div>
         </div>
