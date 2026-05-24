@@ -24,7 +24,7 @@
       </div>
     </nav>
 
-    <main class="flex-1 min-h-0 p-4 overflow-hidden">
+    <main class="flex-1 min-h-0 p-4 overflow-y-auto lg:overflow-hidden">
       <slot />
     </main>
   </div>

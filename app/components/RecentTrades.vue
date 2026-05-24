@@ -65,9 +65,12 @@
 <script setup lang="ts">
 import type { AccountActivityType } from "~/utils/types/Alpaca"
 
+// Only FILL activities are actual trades — the prior `!== "FEE"` filter let
+// through DIV, ACATC, etc. which don't carry transaction_time and were the
+// source of the "Invalid Date" rows.
 const { data: activities } = await useFetch<AccountActivityType[]>("/api/getAccountActivities", {
   transform: (activities) => {
-    return activities.filter(activity => activity.activity_type !== "FEE")
+    return activities.filter(activity => activity.activity_type === "FILL")
       .sort((a, b) => new Date(b.transaction_time).getTime() - new Date(a.transaction_time).getTime())
   },
 })
@@ -120,8 +123,15 @@ const sideColor = (side: string) => {
   return side === "buy" ? "text-green-400" : "text-red-400"
 }
 
-const formatTime = (isoString: string) => {
+const formatTime = (isoString: string | null | undefined) => {
+  if (!isoString) return "—"
   const date = new Date(isoString)
-  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+  if (Number.isNaN(date.getTime())) return "—"
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
 }
 </script>
