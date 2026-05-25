@@ -24,7 +24,7 @@
       </template>
 
       <div class="overflow-y-auto flex-1 min-h-0">
-        <div v-if="!filteredActivities || filteredActivities.length === 0" class="p-4 text-center text-gray-400">
+        <div v-if="!filteredActivities || filteredActivities.length === 0" class="p-4 text-center text-muted">
           No trades found
         </div>
         <div v-else class="space-y-2 p-4">
@@ -36,14 +36,14 @@
           >
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-3 min-w-0">
-                <div class="font-semibold text-base flex-shrink-0">
+                <div class="font-semibold text-base text-highlighted flex-shrink-0">
                   {{ activity.symbol }}
                 </div>
-                <div class="text-xs text-gray-400 whitespace-nowrap">
+                <div class="text-xs text-muted whitespace-nowrap">
                   {{ formatTime(activity.transaction_time) }}
                 </div>
               </div>
-              <div class="text-xs text-gray-500 mt-1 truncate">
+              <div class="text-xs text-dimmed mt-1 truncate">
                 {{ activity.side === 'buy' ? 'BUY' : 'SELL' }} · {{ activity.qty }} @ ${{ parseFloat(activity.price).toFixed(2) }}
               </div>
             </div>
@@ -51,7 +51,7 @@
               <div class="font-semibold text-sm" :class="sideColor(activity.side)">
                 {{ activity.side === 'buy' ? '-' : '+' }}${{ (parseFloat(activity.price) * activity.qty).toFixed(2) }}
               </div>
-              <div class="text-xs text-gray-400">
+              <div class="text-xs text-muted">
                 {{ activity.order_status }}
               </div>
             </div>
@@ -120,7 +120,9 @@ const sideClass = (side: string) => {
 }
 
 const sideColor = (side: string) => {
-  return side === "buy" ? "text-green-400" : "text-red-400"
+  return side === "buy"
+    ? "text-green-600 dark:text-green-400"
+    : "text-red-600 dark:text-red-400"
 }
 
 const formatTime = (isoString: string | null | undefined) => {

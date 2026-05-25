@@ -28,23 +28,22 @@
     </div>
     <div
       v-else-if="!positions || positions.length === 0"
-      class="p-4 text-center text-gray-400"
+      class="p-4 text-center text-muted"
     >
       No active positions
     </div>
     <div v-else>
-      <!-- Summary stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 p-4 border-b border-gray-700">
-        <div class="bg-gray-800/50 rounded-lg p-3">
-          <div class="text-xs text-gray-400 uppercase tracking-wide">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 p-4 border-b border-default">
+        <div class="bg-muted rounded-lg p-3">
+          <div class="text-xs text-muted uppercase tracking-wide">
             Total Value
           </div>
-          <div class="text-lg font-semibold text-white mt-1">
+          <div class="text-lg font-semibold text-highlighted mt-1">
             {{ formatCurrency(totalMarketValue) }}
           </div>
         </div>
-        <div class="bg-gray-800/50 rounded-lg p-3">
-          <div class="text-xs text-gray-400 uppercase tracking-wide">
+        <div class="bg-muted rounded-lg p-3">
+          <div class="text-xs text-muted uppercase tracking-wide">
             Total Gain/Loss
           </div>
           <div
@@ -54,25 +53,24 @@
             {{ formatCurrency(totalGainLoss) }} ({{ totalGainLossPercent.toFixed(2) }}%)
           </div>
         </div>
-        <div class="bg-gray-800/50 rounded-lg p-3">
-          <div class="text-xs text-gray-400 uppercase tracking-wide">
+        <div class="bg-muted rounded-lg p-3">
+          <div class="text-xs text-muted uppercase tracking-wide">
             Positions
           </div>
-          <div class="text-lg font-semibold text-white mt-1">
+          <div class="text-lg font-semibold text-highlighted mt-1">
             {{ positions.length }}
           </div>
         </div>
-        <div class="bg-gray-800/50 rounded-lg p-3">
-          <div class="text-xs text-gray-400 uppercase tracking-wide">
+        <div class="bg-muted rounded-lg p-3">
+          <div class="text-xs text-muted uppercase tracking-wide">
             Long/Short
           </div>
-          <div class="text-lg font-semibold text-white mt-1">
+          <div class="text-lg font-semibold text-highlighted mt-1">
             {{ longCount }}/{{ shortCount }}
           </div>
         </div>
       </div>
 
-      <!-- Positions list -->
       <div class="overflow-y-auto max-h-96">
         <div class="space-y-2 p-4">
           <div
@@ -83,7 +81,7 @@
           >
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <div class="font-semibold text-base min-w-16">
+                <div class="font-semibold text-base text-highlighted min-w-16">
                   {{ position.symbol }}
                 </div>
                 <div
@@ -93,10 +91,10 @@
                   {{ position.side.toUpperCase() }}
                 </div>
               </div>
-              <div class="text-xs text-gray-400 space-y-1">
+              <div class="text-xs text-muted space-y-1">
                 <div>
                   {{ Math.abs(position.qty) }} shares @ ${{ parseFloat(position.current_price).toFixed(2) }}
-                  <span class="ml-2 text-gray-500">
+                  <span class="ml-2 text-dimmed">
                     (Entry: ${{ parseFloat(position.avg_entry_price).toFixed(2) }})
                   </span>
                 </div>
@@ -107,7 +105,7 @@
               </div>
             </div>
             <div class="text-right min-w-32">
-              <div class="font-semibold text-base mb-1">
+              <div class="font-semibold text-base text-highlighted mb-1">
                 {{ formatCurrency(parseFloat(position.market_value)) }}
               </div>
               <div
@@ -116,7 +114,7 @@
               >
                 {{ gainLossDisplay(position) }}
               </div>
-              <div class="text-xs text-gray-400 mt-1">
+              <div class="text-xs text-muted mt-1">
                 {{ changeDisplay(position) }}
               </div>
             </div>
@@ -177,7 +175,9 @@ const totalGainLossPercent = computed(() => {
 })
 
 const totalGainLossColor = computed(() => {
-  return totalGainLoss.value >= 0 ? "text-green-400" : "text-red-400"
+  return totalGainLoss.value >= 0
+    ? "text-green-600 dark:text-green-400"
+    : "text-red-600 dark:text-red-400"
 })
 
 const longCount = computed(() => {
@@ -225,13 +225,15 @@ const positionBgClass = (position: AlpacaPosition) => {
 
 const positionTagClass = (position: AlpacaPosition) => {
   return position.side === "long"
-    ? "bg-green-500/20 text-green-400"
-    : "bg-red-500/20 text-red-400"
+    ? "bg-green-500/20 text-green-700 dark:text-green-400"
+    : "bg-red-500/20 text-red-700 dark:text-red-400"
 }
 
 const gainLossColor = (position: AlpacaPosition) => {
   const gainLoss = calculateGainLoss(position)
-  return gainLoss >= 0 ? "text-green-400" : "text-red-400"
+  return gainLoss >= 0
+    ? "text-green-600 dark:text-green-400"
+    : "text-red-600 dark:text-red-400"
 }
 
 const gainLossDisplay = (position: AlpacaPosition) => {

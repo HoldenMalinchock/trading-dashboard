@@ -1,13 +1,13 @@
 <template>
-  <div class="h-screen bg-slate-950 flex flex-col overflow-hidden">
-    <nav class="shrink-0 h-14 px-4 flex items-center gap-6 border-b border-slate-800 bg-slate-900/50 backdrop-blur">
+  <div class="h-screen bg-slate-100 dark:bg-slate-950 flex flex-col overflow-hidden">
+    <nav class="shrink-0 h-14 px-4 flex items-center gap-6 border-b border-default bg-slate-200/60 dark:bg-slate-900/50 backdrop-blur">
       <NuxtLink
         to="/"
-        class="flex items-center gap-2 font-semibold text-white"
+        class="flex items-center gap-2 font-semibold text-highlighted"
       >
         <UIcon
           name="i-heroicons-chart-bar"
-          class="w-5 h-5 text-primary-400"
+          class="w-5 h-5 text-primary-500 dark:text-primary-400"
         />
         <span>Trading Dashboard</span>
       </NuxtLink>
@@ -42,7 +42,7 @@ const linkClass = (to: string) => {
   const isActive = to === "/" ? route.path === "/" : route.path.startsWith(to)
   const base = "px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
   return isActive
-    ? `${base} bg-slate-800 text-white`
-    : `${base} text-slate-400 hover:text-white hover:bg-slate-800/50`
+    ? `${base} bg-elevated text-highlighted`
+    : `${base} text-muted hover:text-highlighted hover:bg-elevated/50`
 }
 </script>
