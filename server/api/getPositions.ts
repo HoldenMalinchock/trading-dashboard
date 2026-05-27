@@ -4,7 +4,10 @@ export interface AlpacaPosition {
   symbol: string
   exchange: string
   asset_easy_to_borrow: boolean
-  qty: number
+  // Alpaca returns numeric fields as strings; keep the wire type honest and
+  // let consumers parseFloat as needed. Previously typed as `number`, which
+  // only worked by accidental JS coercion (e.g. Math.abs("5")).
+  qty: string
   avg_entry_price: string
   side: "long" | "short"
   market_value: string

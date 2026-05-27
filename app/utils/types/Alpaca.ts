@@ -44,19 +44,28 @@ export interface AlpacaAccount {
   pending_reg_taf_fees: string
 }
 
+// Alpaca's /account/activities endpoint returns a union of activity shapes
+// (FILL, DIV, ACATC, FEE, etc). Only FILL activities carry order/trade fields
+// like price, side, symbol, qty, leaves_qty, etc. — everything else can omit
+// most of them. This schema captures the FILL shape (which is all the UI
+// consumes) while keeping the trade fields optional so a stray non-FILL
+// row doesn't cause validation to throw.
+//
+// Alpaca returns numeric fields as strings on the wire; we keep them as
+// strings here and parseFloat at the call site.
 export const AccountActivitySchema = z.object({
   id: z.string(),
   activity_type: z.string(),
-  transaction_time: z.string(),
-  type: z.string(),
-  price: z.string(),
-  qty: z.number(),
-  side: z.string(),
-  symbol: z.string(),
-  leaves_qty: z.string(),
-  order_id: z.string(),
-  cum_qty: z.string(),
-  order_status: z.string(),
+  transaction_time: z.string().optional(),
+  type: z.string().optional(),
+  price: z.string().optional(),
+  qty: z.string().optional(),
+  side: z.string().optional(),
+  symbol: z.string().optional(),
+  leaves_qty: z.string().optional(),
+  order_id: z.string().optional(),
+  cum_qty: z.string().optional(),
+  order_status: z.string().optional(),
 })
 
 export type AccountActivityType = z.infer<typeof AccountActivitySchema>
