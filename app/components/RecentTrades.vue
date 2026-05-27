@@ -44,12 +44,12 @@
                 </div>
               </div>
               <div class="text-xs text-dimmed mt-1 truncate">
-                {{ activity.side === 'buy' ? 'BUY' : 'SELL' }} · {{ activity.qty }} @ ${{ parseFloat(activity.price).toFixed(2) }}
+                {{ activity.side === 'buy' ? 'BUY' : 'SELL' }} · {{ qtyOf(activity) }} @ ${{ priceOf(activity).toFixed(2) }}
               </div>
             </div>
             <div class="text-right flex-shrink-0 ml-2">
               <div class="font-semibold text-sm" :class="sideColor(activity.side)">
-                {{ activity.side === 'buy' ? '-' : '+' }}${{ (parseFloat(activity.price) * activity.qty).toFixed(2) }}
+                {{ activity.side === 'buy' ? '-' : '+' }}${{ (priceOf(activity) * qtyOf(activity)).toFixed(2) }}
               </div>
               <div class="text-xs text-muted">
                 {{ activity.order_status }}
@@ -65,13 +65,16 @@
 <script setup lang="ts">
 import type { AccountActivityType } from "~/utils/types/Alpaca"
 
-// Only FILL activities are actual trades — the prior `!== "FEE"` filter let
-// through DIV, ACATC, etc. which don't carry transaction_time and were the
-// source of the "Invalid Date" rows.
+// The server endpoint now restricts to FILL activities at the Alpaca API
+// level (activity_types=FILL), so we no longer need to filter client-side.
+// Trade fields (price, qty, side, transaction_time, symbol) are typed as
+// optional on AccountActivityType to match Alpaca's union response shape,
+// so helpers below coerce safely.
 const { data: activities } = await useFetch<AccountActivityType[]>("/api/getAccountActivities", {
   transform: (activities) => {
-    return activities.filter(activity => activity.activity_type === "FILL")
-      .sort((a, b) => new Date(b.transaction_time).getTime() - new Date(a.transaction_time).getTime())
+    return [...activities].sort(
+      (a, b) => timeOf(b) - timeOf(a),
+    )
   },
 })
 
@@ -87,39 +90,54 @@ const sortOptions = [
   { label: "Smallest", value: "size_asc" },
 ]
 
+// Safe accessors — Alpaca returns numeric fields as strings, and non-FILL
+// activities (should any slip through) may omit them entirely.
+function qtyOf(a: AccountActivityType): number {
+  return a.qty ? parseFloat(a.qty) : 0
+}
+
+function priceOf(a: AccountActivityType): number {
+  return a.price ? parseFloat(a.price) : 0
+}
+
+function timeOf(a: AccountActivityType): number {
+  if (!a.transaction_time) return 0
+  const t = new Date(a.transaction_time).getTime()
+  return Number.isNaN(t) ? 0 : t
+}
+
 const filteredActivities = computed(() => {
   let filtered = activities.value ?? []
 
-  // Filter by symbol
   if (searchSymbol.value) {
-    filtered = filtered.filter(a => a.symbol.toUpperCase().includes(searchSymbol.value.toUpperCase()))
+    const needle = searchSymbol.value.toUpperCase()
+    filtered = filtered.filter(a => (a.symbol ?? "").toUpperCase().includes(needle))
   }
 
-  // Sort
   switch (sortBy.value) {
     case "oldest":
-      return filtered.sort((a, b) => new Date(a.transaction_time).getTime() - new Date(b.transaction_time).getTime())
+      return [...filtered].sort((a, b) => timeOf(a) - timeOf(b))
     case "symbol_asc":
-      return filtered.sort((a, b) => a.symbol.localeCompare(b.symbol))
+      return [...filtered].sort((a, b) => (a.symbol ?? "").localeCompare(b.symbol ?? ""))
     case "symbol_desc":
-      return filtered.sort((a, b) => b.symbol.localeCompare(a.symbol))
+      return [...filtered].sort((a, b) => (b.symbol ?? "").localeCompare(a.symbol ?? ""))
     case "size_desc":
-      return filtered.sort((a, b) => b.qty - a.qty)
+      return [...filtered].sort((a, b) => qtyOf(b) - qtyOf(a))
     case "size_asc":
-      return filtered.sort((a, b) => a.qty - b.qty)
+      return [...filtered].sort((a, b) => qtyOf(a) - qtyOf(b))
     case "recent":
     default:
-      return filtered.sort((a, b) => new Date(b.transaction_time).getTime() - new Date(a.transaction_time).getTime())
+      return [...filtered].sort((a, b) => timeOf(b) - timeOf(a))
   }
 })
 
-const sideClass = (side: string) => {
+const sideClass = (side: string | undefined) => {
   return side === "buy"
     ? "border-green-500/30 bg-green-500/5 hover:bg-green-500/10"
     : "border-red-500/30 bg-red-500/5 hover:bg-red-500/10"
 }
 
-const sideColor = (side: string) => {
+const sideColor = (side: string | undefined) => {
   return side === "buy"
     ? "text-green-600 dark:text-green-400"
     : "text-red-600 dark:text-red-400"

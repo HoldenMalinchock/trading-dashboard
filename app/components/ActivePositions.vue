@@ -93,7 +93,7 @@
               </div>
               <div class="text-xs text-muted space-y-1">
                 <div>
-                  {{ Math.abs(position.qty) }} shares @ ${{ parseFloat(position.current_price).toFixed(2) }}
+                  {{ Math.abs(parseFloat(position.qty)) }} shares @ ${{ parseFloat(position.current_price).toFixed(2) }}
                   <span class="ml-2 text-dimmed">
                     (Entry: ${{ parseFloat(position.avg_entry_price).toFixed(2) }})
                   </span>

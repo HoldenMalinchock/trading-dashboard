@@ -1,14 +1,19 @@
 import type { AlpacaAccount } from "~/utils/types/Alpaca"
 
-export default defineEventHandler(async () => {
-  // We need to make a request to the alpaca api to get the account information
-  // Get the % up we are alltime and return that in a value so we can use it on our website
+// Paper accounts start with $100,000. All-time % change is computed against
+// that baseline so the dashboard can show "+X% all-time".
+const STARTING_EQUITY = 100_000
 
+export default defineEventHandler(async () => {
   const alpacaAccount: AlpacaAccount = await $fetch("/api/getAccount")
-  const accountValue = parseInt(alpacaAccount.portfolio_value)
-  const percentChange = (accountValue - 100000) / 1000
+  // Use parseFloat so cents aren't dropped (portfolio_value is a string like "100123.45").
+  const accountValue = parseFloat(alpacaAccount.portfolio_value)
+  // Percent change vs. the $100k starting baseline.
+  // The previous implementation divided by 1000 instead of (STARTING_EQUITY / 100),
+  // which produced values 100x too large.
+  const percentChange = ((accountValue - STARTING_EQUITY) / STARTING_EQUITY) * 100
   return {
-    change: `${percentChange}`,
+    change: `${percentChange.toFixed(2)}`,
     total: accountValue,
   }
 })
